@@ -1,0 +1,608 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Nodejs进阶 | kyrie C</title><meta name="keywords" content="Node.js"><meta name="author" content="小c只会突破"><meta name="copyright" content="小c只会突破"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="fs模块在Nodejs中，所有文件操作都通过fs模块实现。在fs模块中，所有的方法都分为同步和异步两种来实现，具有sync后缀的方法为同步方法 fs中的一些概念  mode（权限位）：不同用户对文件的操作权限，分为文件所有者、文件所属组、其他用户文件操作权限又分为三种，读（r）、写（w）、执行（x），数字表示为八进制数，具备权限的八进制数分别为4、2、1  readFileSync和readFil">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nodejs进阶">
+<meta property="og:url" content="https://kyriecqy.github.io/2022/10/09/Nodejs%E8%BF%9B%E9%98%B6/index.html">
+<meta property="og:site_name" content="kyrie C">
+<meta property="og:description" content="fs模块在Nodejs中，所有文件操作都通过fs模块实现。在fs模块中，所有的方法都分为同步和异步两种来实现，具有sync后缀的方法为同步方法 fs中的一些概念  mode（权限位）：不同用户对文件的操作权限，分为文件所有者、文件所属组、其他用户文件操作权限又分为三种，读（r）、写（w）、执行（x），数字表示为八进制数，具备权限的八进制数分别为4、2、1  readFileSync和readFil">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://kyriecqy.github.io/images/logo.jpg">
+<meta property="article:published_time" content="2022-10-09T01:35:12.000Z">
+<meta property="article:modified_time" content="2022-10-18T13:38:05.951Z">
+<meta property="article:author" content="小c只会突破">
+<meta property="article:tag" content="Node.js">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://kyriecqy.github.io/images/logo.jpg"><link rel="shortcut icon" href="/images/logo.jpg"><link rel="canonical" href="https://kyriecqy.github.io/2022/10/09/Nodejs%E8%BF%9B%E9%98%B6/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Nodejs进阶',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-10-18 21:38:05'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.1.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/irving.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">12</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/images/bg4.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">kyrie C</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Nodejs进阶</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-10-09T01:35:12.000Z" title="发表于 2022-10-09 09:35:12">2022-10-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-10-18T13:38:05.951Z" title="更新于 2022-10-18 21:38:05">2022-10-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Node-js/">Node.js</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Nodejs进阶"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="fs模块"><a href="#fs模块" class="headerlink" title="fs模块"></a>fs模块</h1><p>在Nodejs中，所有文件操作都通过fs模块实现。<br>在fs模块中，所有的方法都分为同步和异步两种来实现，具有sync后缀的方法为同步方法</p>
+<p><strong>fs中的一些概念</strong></p>
+<blockquote>
+<p>mode（权限位）：不同用户对文件的操作权限，分为文件所有者、文件所属组、其他用户<br>文件操作权限又分为三种，读（r）、写（w）、执行（x），数字表示为八进制数，具备权限的八进制数分别为4、2、1</p>
+</blockquote>
+<h2 id="readFileSync和readFile"><a href="#readFileSync和readFile" class="headerlink" title="readFileSync和readFile"></a>readFileSync和readFile</h2><p><strong>readFileSync（同步）</strong></p>
+<p>它有两个参数：</p>
+<ul>
+<li>第一个参数为读取文件的路径或文件描述符</li>
+<li>第二个参数为options，默认值为null，可以传入编码或标识位</li>
+</ul>
+<p>返回值为文件内容，如果没有传入第二个参数，返回的是二进制的格式</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> buf = fs.<span class="title function_">readFileSync</span>(path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;./1.txt&#x27;</span>))</span><br><span class="line"><span class="keyword">let</span> data = fs.<span class="title function_">readFileSync</span>(path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;./1.txt&#x27;</span>), <span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(buf);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(data);</span><br><span class="line"></span><br><span class="line"><span class="comment">//&lt;Buffer 6b 79 72 69 65 20 69 72 76 69 6e 67&gt;</span></span><br><span class="line"><span class="comment">//kyrie irving</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>readFile（异步）</strong><br>异步读取方法前两个参数和同步相同，最后一个参数为回调函数，这个函数有两个参数err和data，该方法没有返回值，回调函数在读取文件成功后执行</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fs.<span class="title function_">readFile</span>(path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;./1.txt&#x27;</span>), <span class="string">&#x27;utf-8&#x27;</span>, <span class="function">(<span class="params">err, data</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(err);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(data);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h2 id="writeFile和writeFileSync"><a href="#writeFile和writeFileSync" class="headerlink" title="writeFile和writeFileSync"></a>writeFile和writeFileSync</h2><p><strong>writeFileSync</strong></p>
+<p>它有三个参数：</p>
+<ul>
+<li>第一个参数为写入文件的路径或文件描述符</li>
+<li>第二个参数为写入的数据，类型为String或Buffer</li>
+<li>第三个参数为options，默认值为null，其中有encoding（编码，默认为UTF-8）、标识位和mode（默认为0o666）</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>)</span><br><span class="line"></span><br><span class="line">fs.<span class="title function_">writeFileSync</span>(path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;./1.txt&#x27;</span>), <span class="string">&#x27;cqy&#x27;</span>)</span><br><span class="line"><span class="comment">//会将1.txt中的原来内容替换成cqy</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>writeFile</strong></p>
+<p>异步写入方法前三个参数与同步相同，最后一个参数为回调函数，函数内有一个参数err，回调函数在文件写入数据成功后执行</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>)</span><br><span class="line"></span><br><span class="line">fs.<span class="title function_">writeFile</span>(path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;./1.txt&#x27;</span>), <span class="string">&#x27;cqy&#x27;</span>, <span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span>(!err) &#123;</span><br><span class="line">    fs.<span class="title function_">readFile</span>(path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;./1.txt&#x27;</span>), <span class="string">&#x27;utf-8&#x27;</span>, <span class="function">(<span class="params">error, data</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(data);</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">//cqy</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="appendFileSync和appendFile"><a href="#appendFileSync和appendFile" class="headerlink" title="appendFileSync和appendFile"></a>appendFileSync和appendFile</h2><p>与<code>writeFile、writeFileSync</code>不同的是，它会在原文件的后面追加内容</p>
+<p>他有三个参数：</p>
+<ul>
+<li>第一个参数为写入文件的路径或文件描述符</li>
+<li>第二个参数为写入的数据，类型为String或Buffer</li>
+<li>第三个参数为options，默认值为null，其中有encoding（编码，默认为UTF-8）、标识位和mode（默认为0o666）</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>)</span><br><span class="line"></span><br><span class="line">fs.<span class="title function_">appendFile</span>(path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;./1.txt&#x27;</span>), <span class="string">&#x27;cqy&#x27;</span>, <span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span>(!err) &#123;</span><br><span class="line">    fs.<span class="title function_">readFile</span>(path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;./1.txt&#x27;</span>), <span class="string">&#x27;utf-8&#x27;</span>, <span class="function">(<span class="params">error, data</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(data);</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">//cqycqy</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="open和close"><a href="#open和close" class="headerlink" title="open和close"></a>open和close</h2><p>open方法用于打开文件，他是一个异步的方法，有四个参数：</p>
+<ul>
+<li>path：文件路径</li>
+<li>flag：标识位</li>
+<li>mode：权限位</li>
+<li>callback：回调函数，有两个参数err和fd（文件描述符），打开文件后执行</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>)</span><br><span class="line"></span><br><span class="line">fs.<span class="title function_">open</span>(<span class="string">&#x27;1.txt&#x27;</span>, <span class="string">&#x27;r&#x27;</span>, <span class="function">(<span class="params">err, fd</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(fd); <span class="comment">//3</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>close方法用于关闭文件，也是异步方法，他有两个参数：</p>
+<ul>
+<li>第一个参数是要关闭文件的文件操作符</li>
+<li>第二个参数是回调函数，回调函数有一个参数err，关闭文件后执行</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>)</span><br><span class="line"></span><br><span class="line">fs.<span class="title function_">open</span>(<span class="string">&#x27;1.txt&#x27;</span>, <span class="string">&#x27;r&#x27;</span>, <span class="function">(<span class="params">err, fd</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(fd);</span><br><span class="line">  fs.<span class="title function_">close</span>(fd, <span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(!err) <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;关闭成功&#x27;</span>);</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="createReadStream"><a href="#createReadStream" class="headerlink" title="createReadStream"></a>createReadStream</h2><p><code>createReadStream</code>用于大文件读取，当文件过大时，无法一次性读取全部内容到缓存中或文件大小位置的情况</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">//创建可读流</span></span><br><span class="line"><span class="keyword">let</span> readStream = fs.<span class="title function_">createReadStream</span>(path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;./1.txt&#x27;</span>), &#123;<span class="attr">encoding</span>: <span class="string">&#x27;utf-8&#x27;</span>&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">//读取文件发生错误事件</span></span><br><span class="line">readStream.<span class="title function_">on</span>(<span class="string">&#x27;error&#x27;</span>, <span class="function">(<span class="params">err</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;发生异常：&#x27;</span>, err);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">//已打开要读取的文件事件</span></span><br><span class="line">readStream.<span class="title function_">on</span>(<span class="string">&#x27;open&#x27;</span>, <span class="function"><span class="params">fd</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;文件已打开：&#x27;</span>, fd);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">//文件已经就位，可用于读取事件</span></span><br><span class="line">readStream.<span class="title function_">on</span>(<span class="string">&#x27;ready&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;文件已准备..&#x27;</span>);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">//文件读取中事件</span></span><br><span class="line">readStream.<span class="title function_">on</span>(<span class="string">&#x27;data&#x27;</span>, <span class="function"><span class="params">chunk</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;读取文件数据：&#x27;</span>, chunk);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">//关闭事件</span></span><br><span class="line">readStream.<span class="title function_">on</span>(<span class="string">&#x27;close&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;文件已关闭&#x27;</span>);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">//文件已打开： 3</span></span><br><span class="line"><span class="comment">//文件已准备..</span></span><br><span class="line"><span class="comment">//读取文件数据： cqycqy</span></span><br><span class="line"><span class="comment">//文件已关闭</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="TCP（传输控制协议）"><a href="#TCP（传输控制协议）" class="headerlink" title="TCP（传输控制协议）"></a>TCP（传输控制协议）</h1><blockquote>
+<p>特点：传输速度较慢、数据传输可靠</p>
+</blockquote>
+<p>TCP只是负责数据的传输，不关心传输的数据格式问题。<br>如果需要使用TCP通信完成某种功能，则需要制定数据格式协议，或者使用第三方协议</p>
+<h2 id="创建TCP服务端和客户端"><a href="#创建TCP服务端和客户端" class="headerlink" title="创建TCP服务端和客户端"></a>创建TCP服务端和客户端</h2><p>使用Nodejs内置的<code>net</code>模块来构建TCP服务端和客户端</p>
+<p><strong>服务端</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> net = <span class="built_in">require</span>(<span class="string">&#x27;net&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = net.<span class="title function_">createServer</span>() <span class="comment">//创建一个服务</span></span><br><span class="line"></span><br><span class="line">server.<span class="title function_">on</span>(<span class="string">&#x27;connection&#x27;</span>, <span class="function"><span class="params">clientSocket</span> =&gt;</span> &#123; <span class="comment">//connection事件，当有客户端连接时会进行回调中的操作</span></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;有新的连接&#x27;</span>);</span><br><span class="line">  <span class="comment">//通过 clientSocket 给当前连接的客户端发送数据</span></span><br><span class="line">  clientSocket.<span class="title function_">write</span>(<span class="string">&#x27;hello&#x27;</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">//服务端绑定端口号</span></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="number">3000</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;server running at 127.0.0.1:3000 &#x27;</span>);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><strong>客户端</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> net = <span class="built_in">require</span>(<span class="string">&#x27;net&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">//创建连接</span></span><br><span class="line"><span class="comment">//传入一个请求对象，最基本的要配置host和port</span></span><br><span class="line"><span class="keyword">const</span> client = net.<span class="title function_">createConnection</span>(&#123;</span><br><span class="line">  <span class="attr">host</span>:<span class="string">&#x27;localhost&#x27;</span>,</span><br><span class="line">  <span class="attr">port</span>: <span class="number">3000</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">client.<span class="title function_">on</span>(<span class="string">&#x27;connect&#x27;</span>, <span class="function">() =&gt;</span> &#123; <span class="comment">//绑定connect事件，当成功连接到服务端时执行回调</span></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;成功连接服务器...&#x27;</span>);</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">//绑定data事件，来接收服务端发过来的数据</span></span><br><span class="line"><span class="comment">//没有绑定时，无法获取服务端发送过来的数据</span></span><br><span class="line"><span class="comment">//默认返回的 data 是 二进制数据，所以要加toString()</span></span><br><span class="line">client.<span class="title function_">on</span>(<span class="string">&#x27;data&#x27;</span>, <span class="function"><span class="params">data</span> =&gt;</span> &#123; </span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(data.<span class="title function_">toString</span>());</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="TCP服务端和客户端的双向通讯"><a href="#TCP服务端和客户端的双向通讯" class="headerlink" title="TCP服务端和客户端的双向通讯"></a>TCP服务端和客户端的双向通讯</h2><p><strong>服务端给客户端发消息，并监听客户端发来的消息</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> net = <span class="built_in">require</span>(<span class="string">&#x27;net&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = net.<span class="title function_">createServer</span>()</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">on</span>(<span class="string">&#x27;connection&#x27;</span>, <span class="function"><span class="params">clientSocket</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;有新连接&#x27;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">//通过 clientSocket 给当前连接的客户端发送数据</span></span><br><span class="line">  clientSocket.<span class="title function_">write</span>(<span class="string">&#x27;hello&#x27;</span>)</span><br><span class="line"></span><br><span class="line">  <span class="comment">//监听clientSocket的data事件，当data事件被触发表示收到数据</span></span><br><span class="line">  clientSocket.<span class="title function_">on</span>(<span class="string">&#x27;data&#x27;</span>, <span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;收到了客户端的数据：&#x27;</span>, data.<span class="title function_">toString</span>());</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="number">3000</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;server running at 127.0.0.1:3000 &#x27;</span>);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><strong>客户端给服务端发消息，并监听服务端发来的消息</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> net = <span class="built_in">require</span>(<span class="string">&#x27;net&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> client = net.<span class="title function_">createConnection</span>(&#123;</span><br><span class="line">  <span class="attr">host</span>:<span class="string">&#x27;localhost&#x27;</span>,</span><br><span class="line">  <span class="attr">port</span>: <span class="number">3000</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">client.<span class="title function_">on</span>(<span class="string">&#x27;connect&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;成功连接服务器...&#x27;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">//给服务端发消息</span></span><br><span class="line">  client.<span class="title function_">write</span>(<span class="string">&#x27;world&#x27;</span>)</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">//监听服务端发来的消息</span></span><br><span class="line">client.<span class="title function_">on</span>(<span class="string">&#x27;data&#x27;</span>, <span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(data.<span class="title function_">toString</span>());</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p><img src="./1.png"><br><img src="./2.png"></p>
+<h1 id="UDP（用户数据报协议）"><a href="#UDP（用户数据报协议）" class="headerlink" title="UDP（用户数据报协议）"></a>UDP（用户数据报协议）</h1><blockquote>
+<p>特点：传输速度快、数据传输不可靠</p>
+</blockquote>
+<p>UDP的三种传播方式：</p>
+<ul>
+<li>单播：目的地址为单一目标</li>
+<li>广播（在IPv6中广播方式被取消）：目的地址为网络中的所有设备，广播数据包被限制在局域网中</li>
+<li>组播：把信息传递给一组目的地址</li>
+</ul>
+<p>**单播面对”一对多”**：对于同一份数据，如果存在多个接收者，Server需发送与接收者数目相同的单播数据包，当接收者较多时，将极大的加重Server的负担</p>
+<p>**广播面对”一对多”**：一旦发送广播数据，则广播域内的所有设备都会收到这个数据包，并且不得不消耗资源去处理，大量的广播将消耗网络带宽以及设备资源</p>
+<p>地址范围分为两种:</p>
+<ul>
+<li>受限广播：它不会被路由转发，IP地址的网络字段和主机字段全为1就是地址<code>255.255.255.255</code></li>
+<li>直接广播：会被路由转发，IP地址的网络字段定义这个网络，主机字段通常全为1，例如<code>192.168.10.255</code></li>
+</ul>
+<p>**组播面对”一对多”**：组播十分适合一对多，只需要将特点的成员加入到组播组，他们就可以收到数据包。当存在多个组播组成员时，源无需发送多个数据拷贝，仅需发送一份即可，组播网络设备会根据实际需要转发或拷贝组播数据</p>
+<h2 id="dgram模块"><a href="#dgram模块" class="headerlink" title="dgram模块"></a>dgram模块</h2><p>Node为我们提供了<code>dgram</code>模块用于构建UDP服务</p>
+<p>使用该模块创建UDP套接字，套接字一旦建立，既可以作为客户端发送数据，也可以作为服务器接收数据</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> dgram = <span class="built_in">require</span>(<span class="string">&#x27;dgram&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> socket = dgram.<span class="title function_">createSocket</span>(<span class="string">&#x27;udp4&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p><strong>socket方法</strong></p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>bind()</td>
+<td>绑定端口和主机</td>
+</tr>
+<tr>
+<td>address()</td>
+<td>返回Socket地址对象</td>
+</tr>
+<tr>
+<td>close()</td>
+<td>关闭Socket并停止监听</td>
+</tr>
+<tr>
+<td>send()</td>
+<td>发送消息</td>
+</tr>
+<tr>
+<td>addMembership()</td>
+<td>添加组播成员</td>
+</tr>
+<tr>
+<td>dropMenbership()</td>
+<td>删除组播成员</td>
+</tr>
+<tr>
+<td>setBroadcast()</td>
+<td>设置是否q启动广播</td>
+</tr>
+<tr>
+<td>setTTL()</td>
+<td>设置数据报生存时间</td>
+</tr>
+<tr>
+<td>setMulticastTTL()</td>
+<td>设置组播数据报生存时间</td>
+</tr>
+</tbody></table>
+<h2 id="UDP单播"><a href="#UDP单播" class="headerlink" title="UDP单播"></a>UDP单播</h2><p>创建一个socket来模拟服务端，另一个socket来模拟客户端</p>
+<p><strong>服务端</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> dgram = <span class="built_in">require</span>(<span class="string">&#x27;dgram&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> socket = dgram.<span class="title function_">createSocket</span>(<span class="string">&#x27;udp4&#x27;</span>)</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">on</span>(<span class="string">&#x27;listening&#x27;</span>, <span class="function">() =&gt;</span> &#123; <span class="comment">//当绑定端口启动成功时执行回调</span></span><br><span class="line">  <span class="keyword">const</span> address = socket.<span class="title function_">address</span>()</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`server running at <span class="subst">$&#123;address.address&#125;</span>:<span class="subst">$&#123;address.port&#125;</span>`</span>);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">on</span>(<span class="string">&#x27;message&#x27;</span>, <span class="function">(<span class="params">msg, remoteInfo</span>) =&gt;</span> &#123; <span class="comment">//当收到客户端消息时执行回调</span></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`server get <span class="subst">$&#123;msg&#125;</span> from <span class="subst">$&#123;remoteInfo.address&#125;</span>:<span class="subst">$&#123;remoteInfo.port&#125;</span>`</span>);</span><br><span class="line">  socket.<span class="title function_">send</span>(<span class="string">&#x27;收到你的消息了&#x27;</span>, remoteInfo.<span class="property">port</span>, remoteInfo.<span class="property">address</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">on</span>(<span class="string">&#x27;error&#x27;</span>, <span class="function"><span class="params">err</span> =&gt;</span> &#123; <span class="comment">//当服务端出现问题时执行回调</span></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;server error: &#x27;</span>, err);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">//当不绑定端口号时，udp会默认分配一个</span></span><br><span class="line">socket.<span class="title function_">bind</span>(<span class="number">3000</span>) <span class="comment">//绑定端口、启动服务（不是必须的）</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>客户端</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> dgram = <span class="built_in">require</span>(<span class="string">&#x27;dgram&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> client = dgram.<span class="title function_">createSocket</span>(<span class="string">&#x27;udp4&#x27;</span>)</span><br><span class="line"></span><br><span class="line">client.<span class="title function_">send</span>(<span class="string">&#x27;hello&#x27;</span>, <span class="number">3000</span>, <span class="string">&#x27;localhost&#x27;</span>) <span class="comment">//向服务端发送数据</span></span><br><span class="line"></span><br><span class="line">client.<span class="title function_">on</span>(<span class="string">&#x27;listening&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> address = client.<span class="title function_">address</span>()</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`server running at <span class="subst">$&#123;address.address&#125;</span>:<span class="subst">$&#123;address.port&#125;</span>`</span>);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">client.<span class="title function_">on</span>(<span class="string">&#x27;message&#x27;</span>, <span class="function">(<span class="params">msg, remoteInfo</span>) =&gt;</span> &#123; </span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`server get <span class="subst">$&#123;msg&#125;</span> from <span class="subst">$&#123;remoteInfo.address&#125;</span>:<span class="subst">$&#123;remoteInfo.port&#125;</span>`</span>);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">client.<span class="title function_">on</span>(<span class="string">&#x27;error&#x27;</span>, <span class="function"><span class="params">err</span> =&gt;</span> &#123; </span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;server error: &#x27;</span>, err);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">//同样的，客户端也可以不绑定端口号</span></span><br></pre></td></tr></table></figure>
+<p><img src="./3.png"><br><img src="./4.png"></p>
+<h2 id="UDP广播"><a href="#UDP广播" class="headerlink" title="UDP广播"></a>UDP广播</h2><p>创建一个socket来模拟服务端，另一个socket来模拟客户端</p>
+<p><strong>服务端</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> dgram = <span class="built_in">require</span>(<span class="string">&#x27;dgram&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> socket = dgram.<span class="title function_">createSocket</span>(<span class="string">&#x27;udp4&#x27;</span>)</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">on</span>(<span class="string">&#x27;listening&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line"></span><br><span class="line">  socket.<span class="title function_">setBroadcast</span>(<span class="literal">true</span>) <span class="comment">//开启广播模式</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> address = socket.<span class="title function_">address</span>()</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`server running at <span class="subst">$&#123;address.address&#125;</span>:<span class="subst">$&#123;address.port&#125;</span>`</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">//每个2秒发送一条广播消息</span></span><br><span class="line">  <span class="built_in">setInterval</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">//受限地址广播</span></span><br><span class="line">    socket.<span class="title function_">send</span>(<span class="string">&#x27;hello&#x27;</span>, <span class="number">8000</span>, <span class="string">&#x27;255.255.255.255&#x27;</span>)</span><br><span class="line">  &#125;, <span class="number">2000</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">on</span>(<span class="string">&#x27;message&#x27;</span>, <span class="function">(<span class="params">msg, remoteInfo</span>) =&gt;</span> &#123; </span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`server get <span class="subst">$&#123;msg&#125;</span> from <span class="subst">$&#123;remoteInfo.address&#125;</span>:<span class="subst">$&#123;remoteInfo.port&#125;</span>`</span>);</span><br><span class="line">  socket.<span class="title function_">send</span>(<span class="string">&#x27;收到你的消息了&#x27;</span>, remoteInfo.<span class="property">port</span>, remoteInfo.<span class="property">address</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">on</span>(<span class="string">&#x27;error&#x27;</span>, <span class="function"><span class="params">err</span> =&gt;</span> &#123; </span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;server error: &#x27;</span>, err);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">bind</span>(<span class="number">3000</span>)</span><br></pre></td></tr></table></figure>
+
+<p><strong>客户端</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> dgram = <span class="built_in">require</span>(<span class="string">&#x27;dgram&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> client = dgram.<span class="title function_">createSocket</span>(<span class="string">&#x27;udp4&#x27;</span>)</span><br><span class="line"></span><br><span class="line">client.<span class="title function_">on</span>(<span class="string">&#x27;message&#x27;</span>, <span class="function">(<span class="params">msg, remoteInfo</span>) =&gt;</span> &#123; </span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`server get <span class="subst">$&#123;msg&#125;</span> from <span class="subst">$&#123;remoteInfo.address&#125;</span>:<span class="subst">$&#123;remoteInfo.port&#125;</span>`</span>);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">client.<span class="title function_">on</span>(<span class="string">&#x27;error&#x27;</span>, <span class="function"><span class="params">err</span> =&gt;</span> &#123; </span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;server error: &#x27;</span>, err);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">client.<span class="title function_">bind</span>(<span class="number">8000</span>)</span><br></pre></td></tr></table></figure>
+<p><img src="./5.png"><br><img src="./6.png"></p>
+<h2 id="UDP组播"><a href="#UDP组播" class="headerlink" title="UDP组播"></a>UDP组播</h2><p><strong>服务端</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> dgram = <span class="built_in">require</span>(<span class="string">&#x27;dgram&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> socket = dgram.<span class="title function_">createSocket</span>(<span class="string">&#x27;udp4&#x27;</span>)</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">on</span>(<span class="string">&#x27;listening&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> address = socket.<span class="title function_">address</span>()</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`server running at <span class="subst">$&#123;address.address&#125;</span>:<span class="subst">$&#123;address.port&#125;</span>`</span>);</span><br><span class="line">  <span class="built_in">setInterval</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    socket.<span class="title function_">send</span>(<span class="string">&#x27;hello&#x27;</span>, <span class="number">8000</span>, <span class="string">&#x27;224.0.1.100&#x27;</span>) <span class="comment">//224.0.1.100是可用的组播地址</span></span><br><span class="line">  &#125;, <span class="number">2000</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">on</span>(<span class="string">&#x27;message&#x27;</span>, <span class="function">(<span class="params">msg, remoteInfo</span>) =&gt;</span> &#123; </span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`server get <span class="subst">$&#123;msg&#125;</span> from <span class="subst">$&#123;remoteInfo.address&#125;</span>:<span class="subst">$&#123;remoteInfo.port&#125;</span>`</span>);</span><br><span class="line">  socket.<span class="title function_">send</span>(<span class="string">&#x27;收到你的消息了&#x27;</span>, remoteInfo.<span class="property">port</span>, remoteInfo.<span class="property">address</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">on</span>(<span class="string">&#x27;error&#x27;</span>, <span class="function"><span class="params">err</span> =&gt;</span> &#123; </span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;server error: &#x27;</span>, err);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">bind</span>(<span class="number">3000</span>)</span><br></pre></td></tr></table></figure>
+
+<p><strong>客户端</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> dgram = <span class="built_in">require</span>(<span class="string">&#x27;dgram&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> client = dgram.<span class="title function_">createSocket</span>(<span class="string">&#x27;udp4&#x27;</span>)</span><br><span class="line"></span><br><span class="line">client.<span class="title function_">on</span>(<span class="string">&#x27;listening&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> address = client.<span class="title function_">address</span>()</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`client running at <span class="subst">$&#123;address.address&#125;</span>:<span class="subst">$&#123;address.port&#125;</span>`</span>);</span><br><span class="line">  client.<span class="title function_">addMembership</span>(<span class="string">&#x27;224.0.1.100&#x27;</span>) <span class="comment">//加入组播</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">client.<span class="title function_">on</span>(<span class="string">&#x27;message&#x27;</span>, <span class="function">(<span class="params">msg, remoteInfo</span>) =&gt;</span> &#123; </span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`clent get <span class="subst">$&#123;msg&#125;</span> from <span class="subst">$&#123;remoteInfo.address&#125;</span>:<span class="subst">$&#123;remoteInfo.port&#125;</span>`</span>);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">client.<span class="title function_">on</span>(<span class="string">&#x27;error&#x27;</span>, <span class="function"><span class="params">err</span> =&gt;</span> &#123; </span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;client error: &#x27;</span>, err);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">client.<span class="title function_">bind</span>(<span class="number">8000</span>)</span><br></pre></td></tr></table></figure>
+
+<h1 id="Http服务"><a href="#Http服务" class="headerlink" title="Http服务"></a>Http服务</h1><p>Node提供了基本的http和https模块用于HTTP和HTTPS的封装</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> server = http.<span class="title function_">createServer</span>()</span><br></pre></td></tr></table></figure>
+
+<p><strong>Server实例</strong></p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>‘close’</td>
+<td>服务关闭时触发</td>
+</tr>
+<tr>
+<td>‘request’</td>
+<td>收到请求消息时触发</td>
+</tr>
+<tr>
+<td>server.close()</td>
+<td>关闭服务</td>
+</tr>
+<tr>
+<td>server.listening</td>
+<td>获取服务状态</td>
+</tr>
+</tbody></table>
+<p><strong>请求对象</strong></p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>request.method</td>
+<td>请求方法</td>
+</tr>
+<tr>
+<td>request.url</td>
+<td>请求路径</td>
+</tr>
+<tr>
+<td>request.headers</td>
+<td>请求头</td>
+</tr>
+<tr>
+<td>request.httpVersion</td>
+<td>请求HTTP协议版本</td>
+</tr>
+</tbody></table>
+<p><strong>响应对象</strong></p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>response.end()</td>
+<td>结束响应</td>
+</tr>
+<tr>
+<td>response.setHeader(name, value)</td>
+<td>设置响应头</td>
+</tr>
+<tr>
+<td>response.removeHeader(name, value)</td>
+<td>删除响应头</td>
+</tr>
+<tr>
+<td>response.statusCode</td>
+<td>设置响应状态码</td>
+</tr>
+<tr>
+<td>response.statusMessage</td>
+<td>设置响应状态短语</td>
+</tr>
+<tr>
+<td>response.write()</td>
+<td>写入响应数据</td>
+</tr>
+<tr>
+<td>response.writeHead()</td>
+<td>写入响应头</td>
+</tr>
+</tbody></table>
+<p><strong>构建基本的http服务</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = http.<span class="title function_">createServer</span>(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  res.<span class="property">statusCode</span> = <span class="number">200</span></span><br><span class="line">  res.<span class="title function_">setHeader</span>(<span class="string">&#x27;Content-Type&#x27;</span>, <span class="string">&#x27;text/plain&#x27;</span>)</span><br><span class="line">  res.<span class="title function_">end</span>(<span class="string">&#x27;Hello World\n&#x27;</span>) <span class="comment">//结束响应的同时发送消息</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> hostname = <span class="string">&#x27;127.0.0.1&#x27;</span></span><br><span class="line"><span class="keyword">const</span> port = <span class="number">3000</span></span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(port, hostname, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`Server running at http://<span class="subst">$&#123;hostname&#125;</span>:<span class="subst">$&#123;port&#125;</span>`</span>);</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">//在浏览器中输入服务端地址就可以看到返回的消息</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>响应html内容</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = http.<span class="title function_">createServer</span>(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  fs.<span class="title function_">readFile</span>(<span class="string">&#x27;./index.html&#x27;</span>, <span class="function">(<span class="params">err, data</span>) =&gt;</span> &#123; <span class="comment">//读取html文件</span></span><br><span class="line">    <span class="keyword">if</span>(err) &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(err);</span><br><span class="line">    &#125;</span><br><span class="line">    res.<span class="property">statusCode</span> = <span class="number">200</span></span><br><span class="line">    res.<span class="title function_">setHeader</span>(<span class="string">&#x27;Content-Type&#x27;</span>, <span class="string">&#x27;text/html; charset=utf-8&#x27;</span>) <span class="comment">//设置响应头为html格式</span></span><br><span class="line">    res.<span class="title function_">end</span>(data) <span class="comment">//返回html文件内容</span></span><br><span class="line">  &#125;)</span><br><span class="line">  </span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> hostname = <span class="string">&#x27;127.0.0.1&#x27;</span></span><br><span class="line"><span class="keyword">const</span> port = <span class="number">3000</span></span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(port, hostname, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`Server running at http://<span class="subst">$&#123;hostname&#125;</span>:<span class="subst">$&#123;port&#125;</span>`</span>);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="统一处理静态资源"><a href="#统一处理静态资源" class="headerlink" title="统一处理静态资源"></a>统一处理静态资源</h2><p>统一处理静态资源要根据客户端需求返回资源，这给响应头的配置造成了一定的困难<br>可以使用<code>mime</code>工具来帮助我们根据不同资源生成不同响应头</p>
+<p><strong>下载mime包</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i mime</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>mime有两个方法：<br>mime.getType() 传入文件扩展名，返回对应的响应头类型  例如：mime.getType(‘txt’) &#x3D;&gt; ‘text&#x2F;plain’<br>mime.getExtension() 传入响应头类型返回文件扩展名 例如：mime.getExtension(‘text&#x2F;plain’) &#x3D;&gt; ‘txt’</p>
+</blockquote>
+<blockquote>
+<p>在html中请求的src资源，是将src中的相对路径拼接到http路径之后发起请求来获取<br>例如：<script src="./static/js/index.js"></script> 就是 <code>http://127.0.0.1:4000/static/js/index.js</code></p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> mime = <span class="built_in">require</span>(<span class="string">&#x27;mime&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = http.<span class="title function_">createServer</span>(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> url = req.<span class="property">url</span></span><br><span class="line">  <span class="keyword">if</span>(url === <span class="string">&#x27;/&#x27;</span>) &#123;</span><br><span class="line">    fs.<span class="title function_">readFile</span>(<span class="string">&#x27;./index.html&#x27;</span>, <span class="function">(<span class="params">err, data</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">if</span>(err) &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(err);</span><br><span class="line">      &#125;</span><br><span class="line">      res.<span class="property">statusCode</span> = <span class="number">200</span></span><br><span class="line">      res.<span class="title function_">setHeader</span>(<span class="string">&#x27;Content-Type&#x27;</span>, <span class="string">&#x27;text/html; charset=utf-8&#x27;</span>)</span><br><span class="line">      res.<span class="title function_">end</span>(data)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;<span class="keyword">else</span> <span class="keyword">if</span>(url.<span class="title function_">startsWith</span>(<span class="string">&#x27;/static/&#x27;</span>)) &#123; <span class="comment">//匹配静态资源</span></span><br><span class="line">    fs.<span class="title function_">readFile</span>(<span class="string">`.<span class="subst">$&#123;url&#125;</span>`</span>, <span class="function">(<span class="params">err, data</span>) =&gt;</span> &#123; <span class="comment">// .$&#123;url&#125;表示相对路径</span></span><br><span class="line">      <span class="keyword">if</span>(err) &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(err);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">let</span> contentType = mime.<span class="title function_">getType</span>(path.<span class="title function_">extname</span>(url))  <span class="comment">//得到对应的响应头</span></span><br><span class="line">      res.<span class="property">statusCode</span> = <span class="number">200</span></span><br><span class="line">      res.<span class="title function_">setHeader</span>(<span class="string">&#x27;Content-Type&#x27;</span>, contentType)</span><br><span class="line">      res.<span class="title function_">end</span>(data)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> hostname = <span class="string">&#x27;127.0.0.1&#x27;</span></span><br><span class="line"><span class="keyword">const</span> port = <span class="number">3000</span></span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(port, hostname, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`Server running at http://<span class="subst">$&#123;hostname&#125;</span>:<span class="subst">$&#123;port&#125;</span>`</span>);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h1 id="Https服务"><a href="#Https服务" class="headerlink" title="Https服务"></a>Https服务</h1><p>HTTPS是基于TLS&#x2F;SSL的HTTP协议，HTTP协议中的所有数据都是使用明文传输的，而HTTP是将数据加密后进行传输<br>在HTTPS数据传输的过程中，需要用SSL&#x2F;TLS对数据进行加密和解密，TLS&#x2F;SSl是一个公钥&#x2F;私钥结构，数据采用对称加密，密钥使用非对称进行加密</p>
+<p>但是，服务器可能会被伪造，中间截取后骗取密钥，对数据造成泄露</p>
+<p>为了解决这个问题，TSL&#x2F;SSL引入了数字证书进行认证，与直接使用公钥不同，数字证书包含了服务器的名称和主机名、服务器的公钥、签名颁发机构的名称、来自签名颁发机构的签名，连接建立前，会通过证书中的签名确认收到的公钥是来自目标服务器的，从而产生信任关系</p>
+<blockquote>
+<p>第三方数字认证中心（Certificate Authority），简称CA</p>
+</blockquote>
+<h1 id="事件循环"><a href="#事件循环" class="headerlink" title="事件循环"></a>事件循环</h1><p>事件循环允许Node.js执行非阻塞I&#x2F;O操作，尽管javaScript是单线程的，由于大多数现代内核都是多线程的，因此它们可以处理在后台执行的多个操作。当其中一个操作完成时，内核会告诉Node.js，以便可以将相应的回调添加到轮询队列中以最终执行</p>
+<blockquote>
+<p>事件循环的本质：在浏览器或者node环境中，运行时对js脚本的调度方式就叫做事件循环</p>
+</blockquote>
+<h2 id="浏览器事件循环"><a href="#浏览器事件循环" class="headerlink" title="浏览器事件循环"></a>浏览器事件循环</h2><p><strong>JS为什么是单线程的？</strong><br>浏览器js的作用是操作DOM，这决定了它只能是单线程的，不然会带来复杂的同步问题。假设js同时有两个线程，一个线程在某个dom上添加内容，另一个线程删除了这个dom节点，这时浏览器该以哪个线程为准？</p>
+<p><strong>任务队列</strong><br>单线程就意味着所有的任务需要排队，但是I&#x2F;O操作时cpu是闲着的。所以js就设计成了一门异步的语言。<br>任务分为两种：一种是同步任务（synchronous），另一种是异步任务（asynchronous）</p>
+<ul>
+<li>所有同步任务都在主线程上执行，形成一个执行栈（execution context stack）</li>
+<li>主线程外，还维护着一个<strong>任务队列</strong>。只要异步任务有了运行结果，就在任务队列之中放置一个事件</li>
+<li>一旦执行栈中的所有同步任务执行完毕，系统就会读取任务队列，看看里面有哪些事件。那些对应的异步任务就会结束等待状态，进入执行栈，开始执行</li>
+<li>主线程不断重复上面的第三步</li>
+</ul>
+<p>例如下列代码，</p>
+<ul>
+<li>setTimeout先进入主线程，然后异步fn函数被加入到I&#x2F;O中</li>
+<li>setTimeout出栈，主线程继续执行，console进入主线程，打印<code>main</code></li>
+<li>1秒之后将fn加入到任务队列</li>
+<li>任务队列检查主线程是否有任务在执行，发现主线程没有任务，将fn函数加入到主线程，打印<code>fn</code><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="title function_">fn</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;fn&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">setTimeout</span>(fn, <span class="number">1000</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;main&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//main</span></span><br><span class="line"><span class="comment">//fn</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><strong>主线程从任务队列中读取事件，这个过程是循环不断的，所以整个的这种运行机制又称为Event Lop（事件循环）</strong></p>
+<h3 id="宏任务与微任务"><a href="#宏任务与微任务" class="headerlink" title="宏任务与微任务"></a>宏任务与微任务</h3><p>除了广义的同步任务和异步任务，js单线程中的任务可以细分为宏任务（macrotask）和微任务（microtask）</p>
+<ul>
+<li>宏任务：script（整体代码）、<code>setTimeout</code>、<code>setInterval</code>、<code>setImmediate</code>、<code>I/O</code>、<code>UI rendering</code></li>
+<li>微任务：<code>Promise</code>、<code>process</code>、<code>nextTick</code>、<code>Object</code>、<code>observe</code>、<code>MutationObserver</code></li>
+</ul>
+<blockquote>
+<p>宏任务进入主线程，执行过程中会收集微任务加入微任务队列<br>宏任务执行完成后，立马执行微任务中的任务。微任务执行过程中将再次收集宏任务，并加入到宏任务队列<br>反复执行1，2操作</p>
+</blockquote>
+<p><img src="./7.png"></p>
+<p>例如下列代码</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;setTimeout&#x27;</span>);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;promise&#x27;</span>);</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;main&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//main</span></span><br><span class="line"><span class="comment">//promise</span></span><br><span class="line"><span class="comment">//setTimeout</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>首先setTimeout进入宏任务，然后将<code>log(&#39;setTimeout&#39;)</code>放到I&#x2F;O中，setTimeout出队</li>
+<li>然后Promise中的<code>log(&#39;promise&#39;)</code>加入到微任务队列中</li>
+<li><code>log(&#39;main&#39;)</code>加入到宏任务队列，打印<code>main</code>，<code>log(&#39;main&#39;)</code>出队</li>
+<li>宏任务执行完毕，执行微任务，打印<code>promise</code></li>
+<li>微任务执行完毕，没有需要执行的新的宏任务。<strong>此处就是事件循环的一环事件（每执行完一轮宏任务和一轮微任务）</strong></li>
+<li>将<code>log(&#39;setTimeout&#39;)</code>加入到宏任务，打印<code>setTimeout</code></li>
+</ul>
+<h2 id="Nodejs事件循环"><a href="#Nodejs事件循环" class="headerlink" title="Nodejs事件循环"></a>Nodejs事件循环</h2><p><strong>node事件循环和浏览器事件循环完全不一样</strong></p>
+<p><strong>Node事件循环阶段</strong></p>
+<ul>
+<li><strong>timers（定时器）</strong>：此阶段执行<code>setTimeout</code>和<code>setInterval</code>调度的回调函数</li>
+<li><strong>I&#x2F;O callback（I&#x2F;O回调）</strong>：此阶段执行几乎所有的回调函数，除了<code>close callbacks（关闭回调）</code> 和 由timers、<code>setImmediate</code>调度的回调</li>
+<li>idle（空转）：此阶段只在node内部使用</li>
+<li><strong>poll（轮询）</strong>：检索新I&#x2F;O事件，在恰当的时候Node会阻塞在这个阶段</li>
+<li>check（检查）：<code>setImmediate</code>的回调会在此阶段被调用</li>
+<li>close callbacks（关闭事件的回调）：例如<code>socket.on(&#39;close&#39;, cb)</code>的回调会在此阶段被调用</li>
+</ul>
+<p>在这些阶段中，比较重要且复杂的是<strong>poll</strong>阶段</p>
+<ul>
+<li>如果poll队列不为空，将会<strong>同步</strong>的执行队列中的回调，直到队列为空或回调到达系统上限</li>
+<li>如果poll队列为空<ul>
+<li>并且代码中有<code>setImmediate</code>的回调，那么将结束poll阶段，执行check阶段的队列（就是<code>setImmediate</code>的回调）</li>
+<li>并且代码中没有<code>setImmediate</code>的回调，事件循环会阻塞 在该阶段，等待回调加入到队列中，一旦有回调加入就执行</li>
+</ul>
+</li>
+<li>如果进入poll阶段，且代码中有timers<ul>
+<li>如果poll处于空闲，事件循环将会检查timers，如果有timers已经到了执行的时间，事件循环就会按顺序进入timers阶段，并执行timers队列（<strong>也就是进入下一阶段的事件循环</strong>）</li>
+</ul>
+</li>
+</ul>
+<p><strong>代码一</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">asyncOperation</span>(<span class="params">cb</span>) &#123; <span class="comment">//模拟读取文件操作</span></span><br><span class="line">  <span class="comment">//假设读取文件花费2ms</span></span><br><span class="line">  fs.<span class="title function_">readFile</span>(path.<span class="title function_">resolve</span>(__dirname, <span class="string">&#x27;xx.txt&#x27;</span>), cb)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;setTimeout&#x27;</span>);</span><br><span class="line">&#125;, <span class="number">10</span>)</span><br><span class="line"></span><br><span class="line"><span class="title function_">asyncOperation</span>(<span class="keyword">function</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> fileReadTime = <span class="title class_">Date</span>.<span class="title function_">now</span>()</span><br><span class="line">  <span class="keyword">while</span>(<span class="title class_">Date</span>.<span class="title function_">now</span>() - fileReadTime &lt; <span class="number">20</span>) &#123; <span class="comment">//此处会卡住20ms</span></span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>分析：</p>
+<ul>
+<li>首先执行setTimeout，将回调放入I&#x2F;O队列，他要10ms之后才执行，然后执行到asyncOperation函数，进行文件读取操作，需要2ms读取完成后执行回调，这个回调也放入到I&#x2F;O中，所以此时timers阶段没有需要执行的回调。</li>
+<li>来到I&#x2F;O callback（I&#x2F;O回调），没有需要执行的回调</li>
+<li>来到poll阶段，现在的时间是0ms。此时poll队列为空，事件循环阻塞在poll阶段</li>
+<li>时间为2ms时，读取文件操作完毕，读取文件的回调进入poll队列被立即执行。而这个回调因为内部的while循环需要执行20ms</li>
+<li>到10ms时，setTimeout已经到了执行的时间，但是由于js为单线程且读取文件的回调占用了这个线程，所以setTimeout的回调无法执行</li>
+<li>当22ms时，读取文件的回调执行完毕，此时poll队列为空且有timers。所以setTimeout回调会被加入到<strong>第二轮事件循环</strong>的timers阶段中，然后执行这个回调</li>
+</ul>
+<p><strong>代码二</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">setTimeout</span>(<span class="keyword">function</span> <span class="title function_">timeout</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;timeout&#x27;</span>);</span><br><span class="line">&#125;, <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="title function_">setImmediate</span>(<span class="keyword">function</span> <span class="title function_">immediate</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;immdeiate&#x27;</span>);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>结果：<strong>上述代码的执行顺序不确定</strong></p>
+<p>不确定的原因：<strong>事件循环的启动也需要事件，可能执行到poll阶段已经超过1ms，此时setImmediate在check阶段被执行，先于setTimeout。反之setTimeout先执行</strong></p>
+<h3 id="nextTick"><a href="#nextTick" class="headerlink" title="nextTick"></a>nextTick</h3><p><code>process.nextTick()</code>不在事件循环的任何阶段执行，而是<strong>在各个阶段切换的中间执行</strong></p>
+<p>设计原因：允许开发之通过调用<code>process.nextTick()</code>来阻塞I&#x2F;O</p>
+<p>示例代码：来看看下面代码的打印结果</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>)</span><br><span class="line"></span><br><span class="line">fs.<span class="title function_">readFile</span>(path.<span class="title function_">resolve</span>(__dirname, <span class="string">&#x27;read.txt&#x27;</span>), <span class="function">() =&gt;</span> &#123; <span class="comment">//假设读取文件耗时2ms</span></span><br><span class="line">  <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;setTimeout&#x27;</span>);</span><br><span class="line">  &#125;, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">  <span class="title function_">setImmediate</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;setImmediate&#x27;</span>);</span><br><span class="line">    process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;nextTick3&#x27;</span>);</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;nextTick1&#x27;</span>);</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  process.<span class="title function_">nextTick</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;nextTick2&#x27;</span>);</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">//nextTick1</span></span><br><span class="line"><span class="comment">//nextTick2</span></span><br><span class="line"><span class="comment">//setImmediate</span></span><br><span class="line"><span class="comment">//nextTick3</span></span><br><span class="line"><span class="comment">//setTimeout</span></span><br></pre></td></tr></table></figure>
+
+<p>分析：</p>
+<ul>
+<li>由于读取文件需要耗时，所以在timers和I&#x2F;O回调阶段没有要执行的回调，事件循环被阻塞在poll阶段</li>
+<li>当文件读取完成，将setTimeout的回调加入I&#x2F;O队列。此时poll还是为空，且有setImmediate回调，所以从poll阶段要走到check阶段，在这期间执行两个nextTick，打印出<code>nextTick1</code>和<code>nextTick2</code></li>
+<li>来到check阶段，执行setImmediate回调，打印<code>setImmediate</code></li>
+<li>从check阶段进入下一轮事件循环的timers阶段之间执行nextTick，打印<code>nextTick3</code></li>
+<li>来到第二轮事件循环的timers，在I&#x2F;O队列的setTimeout回调加入到timers中并执行，打印<code>setTimeout</code></li>
+</ul>
+<h1 id="多线程和多进程"><a href="#多线程和多进程" class="headerlink" title="多线程和多进程"></a>多线程和多进程</h1><blockquote>
+<p>进程是资源分配的最小单位，线程是CPU调度的最小单位<br><strong>线程是进程的一个执行流</strong>，它是比进程更小的能独立运行的基本单位，<strong>一个进程由多个线程组成</strong>，线程与同属一个进程的线程共享进程拥有的全部资源<br><strong>进程有独立的地址空间</strong>，一个进程崩溃后，在保护模式下不会对其他进程造成影响，而线程只是一个进程中的不同执行路线，线程有自己的堆栈和局部变量，但线程没有单独的地址空间，一个线程死掉就等于整个进程死掉</p>
+</blockquote>
+<p>浏览器中的进程和线程：</p>
+<ul>
+<li>进程：一个窗口就是一个进程</li>
+<li>线程：一个窗口由多个线程组成，渲染线程、js执行线程、垃圾回收线程等</li>
+</ul>
+<p>node服务中的进程和线程：</p>
+<ul>
+<li>进程：监听某一个端口的http服务</li>
+<li>线程：http服务由多个线程组成<ul>
+<li>主线程：获取代码、编译执行</li>
+<li>编译线程：主线程执行的时候，可以优化代码</li>
+<li>Profiler线程：记录哪些方法耗时，为优化提供支持</li>
+<li>其他线程：用于垃圾回收等</li>
+</ul>
+</li>
+</ul>
+<p><strong>nodejs为什么需要多进程？</strong><br>nodejs单线程（在nodejs的v10.5版本中加入了多线程），在处理http请求的时候一个错误都会导致整个进程的退出，为了服务的稳定，所以需要多进程</p>
+<p><strong>多进程和多线程的优缺点</strong></p>
+<blockquote>
+<p>多进程和多线程一般都是结合起来使用，不要陷入非此即彼的误区</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>对比维度</th>
+<th>多进程</th>
+<th>多线程</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据共享</td>
+<td>数据共享复杂；数据是分开的，同步简单</td>
+<td>共享进程数据；同步复杂</td>
+</tr>
+<tr>
+<td>内存、CPU</td>
+<td>占用内存多，切换复杂，CPU利用率低</td>
+<td>占用内存少，切换简单，CPU利用率高</td>
+</tr>
+<tr>
+<td>创建、销毁、切换</td>
+<td>复杂，速度慢</td>
+<td>简单，速度快</td>
+</tr>
+<tr>
+<td>编程、调试</td>
+<td>简单</td>
+<td>复杂</td>
+</tr>
+<tr>
+<td>可靠性</td>
+<td>进程间不会相互影响</td>
+<td>一个线程挂掉将导致整个进程挂掉</td>
+</tr>
+<tr>
+<td>分布式</td>
+<td>适应于多核、多机分布式</td>
+<td>适应于多核分布式</td>
+</tr>
+</tbody></table>
+<p><strong>总结：线程快，进程可靠性高</strong></p>
+<h2 id="process进程"><a href="#process进程" class="headerlink" title="process进程"></a>process进程</h2><blockquote>
+<p>process对象是Node的一个全局对象，提供当前Node进程的信息，它可以在脚本的任何位置使用，不必通过require引入</p>
+</blockquote>
+<p><strong>属性：</strong></p>
+<ul>
+<li><code>process.argv</code> 返回一个数组，包含了启动node进程时的命令行参数</li>
+<li><code>process.env</code> 返回包含用户环境信息的对象，可以在脚本中对这个对象进行增删改查的操作</li>
+<li><code>process.pid</code> 返回当前进程的进程号</li>
+<li><code>process.platform</code> 返回当前的操作系统</li>
+<li><code>process.version</code> 返回当前node版本</li>
+</ul>
+<p><strong>方法：</strong></p>
+<ul>
+<li><code>process.cwd()</code> 返回node进程当前工作目录</li>
+<li><code>process.chdir()</code> 变更node进程的工作目录</li>
+<li><code>process.nextTick(fn)</code> 将任务放到当前事件循环的尾部，添加到<code>next tick</code>队列，一旦当前事件轮询队列的任务全部完成，在<code>next tick</code>队列中的所有callback会被依次调用</li>
+<li><code>process.exit()</code> 退出当前进程</li>
+</ul>
+<h2 id="cluster创建多进程"><a href="#cluster创建多进程" class="headerlink" title="cluster创建多进程"></a>cluster创建多进程</h2><p>使用Node内置模块<code>cluster</code>来创建多进程</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> cluster = <span class="built_in">require</span>(<span class="string">&#x27;cluster&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> cpuMuns = <span class="built_in">require</span>(<span class="string">&#x27;os&#x27;</span>).<span class="title function_">cpus</span>().<span class="property">length</span>  <span class="comment">//获取cpu核数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//主进程去fork子进程，然后管理它们</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(cluster.<span class="property">isMaster</span>) &#123; <span class="comment">//如果是主进程</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; cpuMuns; i++) &#123;</span><br><span class="line">    cluster.<span class="title function_">fork</span>() </span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  cluster.<span class="title function_">on</span>(<span class="string">&#x27;exit&#x27;</span>, <span class="function">(<span class="params">work, code, signal</span>) =&gt;</span> &#123; <span class="comment">//监视哪些进程挂掉了</span></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;worker&#x27;</span> + worker.<span class="property">process</span>.<span class="property">pid</span> + <span class="string">&#x27; died&#x27;</span>)</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">&#125;<span class="keyword">else</span> &#123; <span class="comment">//如果是子进程</span></span><br><span class="line"></span><br><span class="line">  http.<span class="title function_">createServer</span>(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">    res.<span class="title function_">end</span>(<span class="string">&#x27;hello&#x27;</span>)</span><br><span class="line">  &#125;).<span class="title function_">listen</span>(<span class="number">8000</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;server running at http://127.0.0.1:8000&#x27;</span>);</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="./8.png"><br><img src="./9.png"></p>
+<p><strong>cluster属性和方法</strong></p>
+<ul>
+<li><code>isMaster</code> 返回该进程是不是主进程</li>
+<li><code>isWorker</code> 返回该进程是不是工作进程</li>
+<li><code>fork()</code> 只能通过主进程调用，会衍生出一个新的worker进程，返回一个进程对象</li>
+<li><code>setupMaster([settings])</code> 用于修改fork的默认行为，一旦调用，将会按照settings进行设置</li>
+<li><code>settings</code> 用于配置，参数列表：<ul>
+<li><code>exec</code>：worker文件路径</li>
+<li><code>args</code>：传递给worker的参数</li>
+<li><code>execArgv</code>：传递给Node可执行文件的参数列表</li>
+</ul>
+</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">小c只会突破</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://kyriecqy.github.io/2022/10/09/Nodejs%E8%BF%9B%E9%98%B6/">https://kyriecqy.github.io/2022/10/09/Nodejs%E8%BF%9B%E9%98%B6/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://kyriecqy.github.io" target="_blank">kyrie C</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Node-js/">Node.js</a></div><div class="post_share"><div class="social-share" data-image="/images/logo.jpg" data-sites="wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/10/25/Rust/"><img class="prev-cover" src="/images/logo.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Rust</div></div></a></div><div class="next-post pull-right"><a href="/2022/09/26/Algorithm/"><img class="next-cover" src="/images/logo.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Algorithm</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/04/29/NodeJs/" title="Node.js"><img class="cover" src="/images/logo.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-04-29</div><div class="title">Node.js</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/irving.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">小c只会突破</div><div class="author-info__description"></div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">12</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">12</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/kyriecqy"><i class="fab fa-github"></i><span>前往Github</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/kyriecqy" target="_blank" title="Github"><i class="fab fa-github"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content"></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#fs%E6%A8%A1%E5%9D%97"><span class="toc-number">1.</span> <span class="toc-text">fs模块</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#readFileSync%E5%92%8CreadFile"><span class="toc-number">1.1.</span> <span class="toc-text">readFileSync和readFile</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#writeFile%E5%92%8CwriteFileSync"><span class="toc-number">1.2.</span> <span class="toc-text">writeFile和writeFileSync</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#appendFileSync%E5%92%8CappendFile"><span class="toc-number">1.3.</span> <span class="toc-text">appendFileSync和appendFile</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#open%E5%92%8Cclose"><span class="toc-number">1.4.</span> <span class="toc-text">open和close</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#createReadStream"><span class="toc-number">1.5.</span> <span class="toc-text">createReadStream</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#TCP%EF%BC%88%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">TCP（传输控制协议）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9B%E5%BB%BATCP%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="toc-number">2.1.</span> <span class="toc-text">创建TCP服务端和客户端</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TCP%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%9A%84%E5%8F%8C%E5%90%91%E9%80%9A%E8%AE%AF"><span class="toc-number">2.2.</span> <span class="toc-text">TCP服务端和客户端的双向通讯</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#UDP%EF%BC%88%E7%94%A8%E6%88%B7%E6%95%B0%E6%8D%AE%E6%8A%A5%E5%8D%8F%E8%AE%AE%EF%BC%89"><span class="toc-number">3.</span> <span class="toc-text">UDP（用户数据报协议）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#dgram%E6%A8%A1%E5%9D%97"><span class="toc-number">3.1.</span> <span class="toc-text">dgram模块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UDP%E5%8D%95%E6%92%AD"><span class="toc-number">3.2.</span> <span class="toc-text">UDP单播</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UDP%E5%B9%BF%E6%92%AD"><span class="toc-number">3.3.</span> <span class="toc-text">UDP广播</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UDP%E7%BB%84%E6%92%AD"><span class="toc-number">3.4.</span> <span class="toc-text">UDP组播</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Http%E6%9C%8D%E5%8A%A1"><span class="toc-number">4.</span> <span class="toc-text">Http服务</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%9F%E4%B8%80%E5%A4%84%E7%90%86%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90"><span class="toc-number">4.1.</span> <span class="toc-text">统一处理静态资源</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Https%E6%9C%8D%E5%8A%A1"><span class="toc-number">5.</span> <span class="toc-text">Https服务</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF"><span class="toc-number">6.</span> <span class="toc-text">事件循环</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF"><span class="toc-number">6.1.</span> <span class="toc-text">浏览器事件循环</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%8F%E4%BB%BB%E5%8A%A1%E4%B8%8E%E5%BE%AE%E4%BB%BB%E5%8A%A1"><span class="toc-number">6.1.1.</span> <span class="toc-text">宏任务与微任务</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nodejs%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF"><span class="toc-number">6.2.</span> <span class="toc-text">Nodejs事件循环</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#nextTick"><span class="toc-number">6.2.1.</span> <span class="toc-text">nextTick</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%92%8C%E5%A4%9A%E8%BF%9B%E7%A8%8B"><span class="toc-number">7.</span> <span class="toc-text">多线程和多进程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#process%E8%BF%9B%E7%A8%8B"><span class="toc-number">7.1.</span> <span class="toc-text">process进程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cluster%E5%88%9B%E5%BB%BA%E5%A4%9A%E8%BF%9B%E7%A8%8B"><span class="toc-number">7.2.</span> <span class="toc-text">cluster创建多进程</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/10/25/Rust/" title="Rust"><img src="/images/logo.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Rust"/></a><div class="content"><a class="title" href="/2022/10/25/Rust/" title="Rust">Rust</a><time datetime="2022-10-25T02:33:16.000Z" title="发表于 2022-10-25 10:33:16">2022-10-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/10/09/Nodejs%E8%BF%9B%E9%98%B6/" title="Nodejs进阶"><img src="/images/logo.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Nodejs进阶"/></a><div class="content"><a class="title" href="/2022/10/09/Nodejs%E8%BF%9B%E9%98%B6/" title="Nodejs进阶">Nodejs进阶</a><time datetime="2022-10-09T01:35:12.000Z" title="发表于 2022-10-09 09:35:12">2022-10-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/09/26/Algorithm/" title="Algorithm"><img src="/images/logo.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Algorithm"/></a><div class="content"><a class="title" href="/2022/09/26/Algorithm/" title="Algorithm">Algorithm</a><time datetime="2022-09-26T08:49:23.000Z" title="发表于 2022-09-26 16:49:23">2022-09-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/09/24/V8%E5%BC%95%E6%93%8E/" title="V8引擎"><img src="/images/logo.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="V8引擎"/></a><div class="content"><a class="title" href="/2022/09/24/V8%E5%BC%95%E6%93%8E/" title="V8引擎">V8引擎</a><time datetime="2022-09-24T02:39:24.000Z" title="发表于 2022-09-24 10:39:24">2022-09-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/09/19/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" title="设计模式"><img src="/images/logo.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="设计模式"/></a><div class="content"><a class="title" href="/2022/09/19/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" title="设计模式">设计模式</a><time datetime="2022-09-19T12:11:33.000Z" title="发表于 2022-09-19 20:11:33">2022-09-19</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/images/bg4.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2022 By 小c只会突破</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><script async>window.onload=function(){var a=document.createElement('script'),b=document.getElementsByTagName('script')[0];a.type='text/javascript',a.async=!0,a.src='/sw-register.js?v='+Date.now(),b.parentNode.insertBefore(a,b)};</script></body></html>
